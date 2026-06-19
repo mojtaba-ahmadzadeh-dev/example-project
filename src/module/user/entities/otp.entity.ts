@@ -11,7 +11,7 @@ import { UserEntity } from "./user.entity";
 
 @Entity(EntityNames.UserOtp)
 export class OtpEntity {
-  @PrimaryGeneratedColumn("uuid")
+  @PrimaryGeneratedColumn("increment")
   id: string;
 
   @Column()
@@ -33,7 +33,7 @@ export class OtpEntity {
   @JoinColumn({ name: "userId" })
   user: UserEntity;
 
-  @Column()
+  @Column({nullable: true})
   userId: string;
 
   @CreateDateColumn()

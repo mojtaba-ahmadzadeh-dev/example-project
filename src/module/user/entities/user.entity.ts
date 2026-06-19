@@ -4,7 +4,7 @@ import { OtpEntity } from './otp.entity';
 
 @Entity(EntityNames.User)
 export class UserEntity {
-  @PrimaryGeneratedColumn('uuid')
+  @PrimaryGeneratedColumn("increment")
   id: string;
 
   @Column({ unique: true, nullable: false })
