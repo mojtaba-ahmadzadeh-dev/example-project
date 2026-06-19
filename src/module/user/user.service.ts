@@ -1,26 +1,44 @@
-import { Injectable } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Injectable, NotFoundException } from "@nestjs/common";
+import { InjectRepository } from "@nestjs/typeorm";
+import { UserEntity } from "./entities/user.entity";
+import { Repository } from "typeorm";
+import { PaginationDto } from "src/common/dto/pagination.dto";
+import {
+  paginationGenerator,
+  paginationSolver,
+} from "src/common/utils/pagination.utils";
 
 @Injectable()
 export class UserService {
-  create(createUserDto: CreateUserDto) {
-    return 'This action adds a new user';
+  constructor(
+    @InjectRepository(UserEntity)
+    private userRepository: Repository<UserEntity>,
+  ) {}
+
+  async findAll(paginationDto: PaginationDto) {
+    const { skip, limit, page } = paginationSolver(paginationDto);
+
+    const totalCount = await this.userRepository.count();
+
+    const users = await this.userRepository.find({
+      skip,
+      take: limit,
+      order: { createdAt: "DESC" },
+    });
+
+    return {
+      pagination: paginationGenerator(totalCount, page, limit),
+      data: users,
+    };
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
+  async findOne(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
 
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
-  }
+    if (!user) {
+      throw new NotFoundException(`کاربر با آیدی ${id} یافت نشد`);
+    }
 
-  update(id: number, updateUserDto: UpdateUserDto) {
-    return `This action updates a #${id} user`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} user`;
+    return user;
   }
 }

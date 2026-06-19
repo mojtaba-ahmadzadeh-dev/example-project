@@ -5,6 +5,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { TypeOrmConfig } from 'src/config/typeorm.config';
 import { AuthModule } from '../auth/auth.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -19,7 +20,8 @@ import { AuthModule } from '../auth/auth.module';
       useFactory: (configService: ConfigService) =>
         TypeOrmConfig(configService),
     }),
-    AuthModule
+    AuthModule,
+    UserModule
   ],
   controllers: [AppController],
   providers: [AppService],
