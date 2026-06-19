@@ -1,11 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { CreateUserDto } from "./dto/create-user.dto";
-import { UpdateUserDto } from "./dto/update-user.dto";
+import { Injectable, NotFoundException } from "@nestjs/common";
 import { InjectRepository } from "@nestjs/typeorm";
 import { UserEntity } from "./entities/user.entity";
 import { Repository } from "typeorm";
 import { PaginationDto } from "src/common/dto/pagination.dto";
-import { paginationGenerator, paginationSolver } from "src/common/utils/pagination.utils";
+import {
+  paginationGenerator,
+  paginationSolver,
+} from "src/common/utils/pagination.utils";
 
 @Injectable()
 export class UserService {
@@ -13,6 +14,7 @@ export class UserService {
     @InjectRepository(UserEntity)
     private userRepository: Repository<UserEntity>,
   ) {}
+
   async findAll(paginationDto: PaginationDto) {
     const { skip, limit, page } = paginationSolver(paginationDto);
 
@@ -28,5 +30,15 @@ export class UserService {
       pagination: paginationGenerator(totalCount, page, limit),
       data: users,
     };
+  }
+
+  async findOne(id: number) {
+    const user = await this.userRepository.findOneBy({ id });
+
+    if (!user) {
+      throw new NotFoundException(`کاربر با آیدی ${id} یافت نشد`);
+    }
+
+    return user;
   }
 }
